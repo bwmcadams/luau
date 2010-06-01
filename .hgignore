@@ -1,0 +1,11 @@
+# use glob syntax
+syntax: glob
+tags
+.git
+# switch  to regexp syntax
+syntax: regexp
+lib_managed
+project/boot
+target/classes/*
+target/test-classes/*
+target
