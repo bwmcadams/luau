@@ -13,5 +13,5 @@ This code is available at both [GitHub][GitHub] and [BitBucket][BitBucket].  Bit
    [pig]: http://hadoop.apache.org/pig/ "Apache Hadoop Pig Query Language"
    [RedBeard0531]: http://github.com/RedBeard0531 "Mathias Stearn of 10Gen"
    [redbeard-talk]: http://github.com/RedBeard0531/Mongo_Presentations/raw/master/20100217-hadoop-bay-area.pdf
-   [bitbucket]: http://bitbucket.org/novus/casbah "Casbah on BitBucket"
-   [github]: http://github.com/novus/casbah "Casbah on GitHub"
+   [bitbucket]: http://bitbucket.org/novus/luau "luau on BitBucket"
+   [github]: http://github.com/novus/luau "luau on GitHub"
