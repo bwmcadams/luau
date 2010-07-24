@@ -15,16 +15,14 @@ import org.apache.hadoop.conf.Configuration
 
 import java.io.{DataInput, DataOutput}
 
-import com.mongodb.{ObjectId => MongoId, DBObject => MongoDBObj, DBAddress => MongoDBAddress}
-import com.novus.mongodb.Implicits._
-import com.novus.mongodb.ScalaMongoCursorWrapper 
+import com.novus.casbah.mongodb.Imports._
 
 
 // Tools for working sanely with Java collections
 import scala.collection.JavaConversions._
 import java.util.{List => JList}
 
-import com.novus.util.Logging
+import com.novus.casbah.util.Logging
 
 /** 
  * 
@@ -53,15 +51,15 @@ object MongoRecordReader extends Logging {
  * @tparam MongoId 
  * @tparam MongoDBObj 
  */
-class MongoRecordReader extends RecordReader[MongoId, MongoDBObj] with Logging {
+class MongoRecordReader extends RecordReader[ObjectId, DBObject] with Logging {
   /* 
    * Since we're required to be mutable, at least be intelligent about it.
    * Because nothings says 'awesome' like a NullPointerException after shredding 3 TB of data
    */
   private var split: Option[MongoSplit] = None
-  private var currentRow: Option[MongoDBObj] = None
+  private var currentRow: Option[DBObject] = None
   private var totalRowCount: Int = -1
-  private var cursor: Option[ScalaMongoCursorWrapper[MongoDBObj]] = None
+  private var cursor: Option[MongoCursor] = None
 
   def initialize(_split: InputSplit, context: TaskAttemptContext) = {
     import ConfigHelper._
@@ -79,17 +77,17 @@ class MongoRecordReader extends RecordReader[MongoId, MongoDBObj] with Logging {
 
     log.trace("Query will be: %s", _q)
 
-    cursor = Some(mongoHandle.find(_q))
+    Some(mongoHandle().find(_q))
      
   }
 
   /** Hadoop seems to WANT null if things aren't in the right order...*/
-  def getCurrentKey: MongoId = currentRow match {
-    case Some(row) => row.get("_id").asInstanceOf[MongoId]
+  def getCurrentKey = currentRow match {
+    case Some(row) => row.get("_id").asInstanceOf[ObjectId]
     case None => null
   }
-  def getCurrentValue: MongoDBObj = currentRow match {
-    case Some(row) => row.asInstanceOf[MongoDBObj]
+  def getCurrentValue = currentRow match {
+    case Some(row) => row.asInstanceOf[DBObject]
     case None => null
   }
   // Throw a DivByZero exception - not sure how else to handle this cleanly right now

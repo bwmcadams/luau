@@ -17,14 +17,14 @@ import org.apache.hadoop.mapreduce.InputSplit
 
 import java.io.{DataInput, DataOutput}
 
-import com.mongodb.{ObjectId => MongoId, DBObject => MongoDBObj, DBAddress => MongoDBAddress}
 
 
 // Tools for working sanely with Java collections
 import scala.collection.JavaConversions._
 import java.util.{List => JList}
 
-import com.novus.util.Logging
+import com.novus.casbah.mongodb.Imports._
+import com.novus.casbah.util.Logging
 
 /** 
  * 
@@ -34,17 +34,17 @@ import com.novus.util.Logging
  * @since 1.0
  */
 object MongoSplit extends Logging {
-  def apply(mongoIDs: Set[MongoId], mongoServers: Array[MongoDBAddress]) = 
+  def apply(mongoIDs: Set[ObjectId], mongoServers: Array[DBAddress]) = 
     new MongoSplit(mongoIDs, mongoServers)
 
   def read(in: DataInput) = {
     val numIds = in.readInt
-    val ids = for (x <- 0 until numIds) yield new MongoId(in.readUTF)
+    val ids = for (x <- 0 until numIds) yield new ObjectId(in.readUTF)
 
     
     val numServers = in.readInt
 
-    val servers = for (x <- 0 until numServers) yield new MongoDBAddress(in.readUTF)
+    val servers = for (x <- 0 until numServers) yield MongoDBAddress(in.readUTF)
 
     log.debug("Statically deserialized MongoSplit {ids = %s, length = %d, servers = %s",
               ids, ids.size, servers)
@@ -76,8 +76,8 @@ object MongoSplit extends Logging {
  * 
  */
 @scala.reflect.BeanInfo
-class MongoSplit(@scala.reflect.BeanProperty val mongoIDs: Set[MongoId], 
-                 val mongoServers: Array[MongoDBAddress]) 
+class MongoSplit(@scala.reflect.BeanProperty val mongoIDs: Set[ObjectId], 
+                 val mongoServers: Array[DBAddress]) 
         extends InputSplit with Logging {
   assume(mongoIDs.size > 0)
   log.debug("Instantiated MongoSplit %s", this)

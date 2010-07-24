@@ -12,8 +12,7 @@ package com.novus.luau.hadoop
 
 import org.apache.hadoop.conf.Configuration
 
-import com.novus.mongodb.{ScalaMongoConn, ScalaMongoCollection}
-import com.mongodb.{DBAddress => MongoDBAddress}
+import com.novus.casbah.mongodb.Imports._
 /** 
  * 
  * 
@@ -27,26 +26,25 @@ object ConfigHelper {
   def splitSize()(implicit config: Configuration): Int = 
     config.getInt("com.novus.luau.mongodb.split_size", DEFAULT_SPLIT_SIZE)
 
-  def mongoConn()(implicit config: Configuration): ScalaMongoConn = {
+  def mongoConn()(implicit config: Configuration): MongoConnection = {
     // @todo support for clusters/shards/multiple connections, etc. (Driver has left/right et al)
     mongoConn(mongoAddress)
   }
 
-  def mongoConn(addr: MongoDBAddress)(implicit config: Configuration): ScalaMongoConn = 
-    ScalaMongoConn(addr)
+  def mongoConn(addr: DBAddress)(implicit config: Configuration) = MongoConnection(addr)
 
-  def mongoAddress()(implicit config: Configuration): MongoDBAddress = {
+  def mongoAddress()(implicit config: Configuration): DBAddress = {
     mongoHost match {
       case Some(hostname) => mongoPort match {
-        case Some(port) => new MongoDBAddress(hostname, port, mongoDB)
-        case None => new MongoDBAddress(hostname, mongoDB)
+        case Some(port) => MongoDBAddress(hostname, port, mongoDB)
+        case None => MongoDBAddress(hostname, mongoDB)
       }
-      case None => new MongoDBAddress("localhost", mongoDB) 
+      case None => MongoDBAddress("localhost", mongoDB) 
     }
   }
 
 
-  def mongoHandle()(implicit config: Configuration): ScalaMongoCollection =  {
+  def mongoHandle()(implicit config: Configuration): MongoCollection =  {
     val conn = mongoConn
     val db  = mongoDB
     val collection = mongoCollection

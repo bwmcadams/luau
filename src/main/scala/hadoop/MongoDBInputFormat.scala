@@ -12,8 +12,6 @@ package com.novus.luau.hadoop
 import org.apache.hadoop.mapreduce._
 import org.apache.hadoop.conf.Configuration
 
-import com.mongodb.{ObjectId => MongoId, DBObject => MongoDBObj} // just make it clear it's a mongo id...
-
 
 // Tools for working sanely with Java collections
 import scala.collection.JavaConversions._
@@ -23,7 +21,8 @@ import java.util.{List => JList}
 import scala.actors.Futures._
 import scala.collection._
 
-import com.novus.util.Logging
+import com.novus.casbah.mongodb.Imports._
+import com.novus.casbah.util.Logging
 
 /** 
  * InputFormat for Hadoop which reads directly from MongoDB
@@ -38,7 +37,7 @@ import com.novus.util.Logging
  * @version 1.0, 04/22/10
  * @since 1.0
  */
-class MongoDBInputFormat extends InputFormat[MongoId, MongoDBObj] with Logging {
+class MongoDBInputFormat extends InputFormat[ObjectId, DBObject] with Logging {
   import ConfigHelper._
 
   def getSplits(context: JobContext): JList[InputSplit] = {
@@ -83,10 +82,10 @@ class MongoDBInputFormat extends InputFormat[MongoId, MongoDBObj] with Logging {
         // Synchronize on the cursor ... May or may not be very efficient thread wise.  
         cursor.synchronized {
           val startSeen = cursor.numSeen
-          val mongoIds =  mutable.HashSet[MongoId]()
+          val mongoIds =  mutable.HashSet[ObjectId]()
           // TODO - Check if we need to iterate one more or if the -1 is ok 
           for (row <- cursor if (cursor.hasNext && (cursor.numSeen < startSeen + splitSize - 1))) {
-            mongoIds += row.get("_id").asInstanceOf[MongoId]
+            mongoIds += row.get("_id").asInstanceOf[ObjectId]
           }
           val seenItems = startSeen - cursor.numSeen 
           assume(seenItems == mongoIds.size)
@@ -106,7 +105,7 @@ class MongoDBInputFormat extends InputFormat[MongoId, MongoDBObj] with Logging {
     splits.asJava
   }
 
-  override def createRecordReader(split: InputSplit, context: TaskAttemptContext): RecordReader[MongoId, MongoDBObj] = {
+  override def createRecordReader(split: InputSplit, context: TaskAttemptContext): RecordReader[ObjectId, DBObject] = {
     implicit val config = context.getConfiguration
     MongoRecordReader()
   }
