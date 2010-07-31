@@ -46,7 +46,7 @@ class MongoDBInputFormat extends InputFormat[ObjectId, DBObject] with Logging {
     checkConfig 
 
     // setup a mongo connection to work with
-    val mongo =  mongoHandle
+    val mongo =  mongoInputHandle
     log.info("Instantiated a connection (w/ db & collection) to Mongo: %s", mongo)
 
     /**
@@ -92,7 +92,7 @@ class MongoDBInputFormat extends InputFormat[ObjectId, DBObject] with Logging {
           log.trace("Saw %s items.  First ID: %s, Last ID: %s", seenItems, mongoIds.head, mongoIds.last)
           // Make the id set immutable on the way out  
           // TODO - Just capture it as an immutable via yield in the for and save memory
-          MongoSplit(mongoIds.toSet, Array(mongoAddress))
+          MongoSplit(mongoIds.toSet, Array(MongoDBAddress(mongoURI)))
         }
       }
     } yield fSplitter
