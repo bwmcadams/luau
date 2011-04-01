@@ -13,10 +13,10 @@
 # the MTA in the Subway files.
 #
 
-MONGO_IMPORT=/usr/bin/mongoimport
+MONGO_IMPORT=/usr/local/bin/mongoimport
 DOS2UNIX=
 IMPORT_CMD="$MONGO_IMPORT -d nyct_subway --type csv --headerline --drop --ignoreBlanks"
-MTA_ZIP="nyct_subway_100308.zip"
+MTA_ZIP="nyct_subway_feb11.zip"
 echo "Unzipping MTA File ($MTA_ZIP)"
 
 unzip -o $MTA_ZIP
